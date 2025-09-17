@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hai, Siti Nabila Sari</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --brand:#6c5ce7;      /* ungu lembut */
+      --brand2:#00d4ff;     /* biru mint */
+      --ink:#0f172a;        /* slate-900 */
+      --muted:#64748b;      /* slate-500 */
+      --glass: rgba(255,255,255,.70);
+      --glass-br: rgba(255,255,255,.9);
+    }
+    html,body{height:100%;scroll-behavior:smooth}
+    body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+      /* Smooth layered gradient (lebih mulus) */
+      background:
+        radial-gradient(1200px 800px at 15% 12%, rgba(108,92,231,.18), rgba(108,92,231,0) 62%),
+        radial-gradient(1100px 700px at 85% 18%, rgba(0,212,255,.16), rgba(0,212,255,0) 60%),
+        linear-gradient(180deg, #f6fbff 0%, #f9faff 45%, #ffffff 100%);
+      background-attachment: fixed;
+    }
+    body.loading{overflow:hidden}
+    body.loading .app-wrap{filter:blur(8px)}
+
+    /* ===== Starfield (falling stars) ===== */
+    .sky{position:fixed; inset:0; z-index:-3; pointer-events:none; display:block;}
+
+    /* ===== Loader overlay ===== */
+    .loader-overlay{position:fixed; inset:0; z-index:9999; display:grid; place-items:center; background:rgba(255,255,255,.35); backdrop-filter:blur(18px) saturate(1.1); -webkit-backdrop-filter:blur(18px) saturate(1.1); transition:opacity .5s ease, visibility .5s ease}
+    .loader-overlay.hide{opacity:0; visibility:hidden}
+    .loader-wrap{position:relative; width:220px; height:220px}
+    .loader-ring{position:absolute; inset:0; border-radius:50%; background:
+      conic-gradient(from 0deg, var(--brand), transparent 40%, var(--brand2) 60%, transparent 80%, var(--brand));
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 14px), #000 calc(100% - 14px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 14px), #000 calc(100% - 14px));
+      animation: spin 1.6s linear infinite;
+      filter: drop-shadow(0 10px 24px rgba(108,92,231,.35));
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loader-photo{position:absolute; inset:18px; border-radius:50%; overflow:hidden; border:2px solid rgba(255,255,255,.9); box-shadow:0 10px 30px rgba(16,24,40,.18)}
+    .loader-photo img{width:100%; height:100%; object-fit:cover}
+    /* hearts orbit */
+    .orbit{position:absolute; inset:-6px; border-radius:50%; animation:orbit 6s linear infinite}
+    .orbit span{position:absolute; font-size:18px; filter: drop-shadow(0 6px 10px rgba(255,0,84,.25))}
+    .orbit span:nth-child(1){top:-10px; left:50%; transform:translateX(-50%)}
+    .orbit span:nth-child(2){bottom:-10px; left:50%; transform:translateX(-50%)}
+    .orbit span:nth-child(3){left:-8px; top:50%; transform:translateY(-50%)}
+    .orbit span:nth-child(4){right:-8px; top:50%; transform:translateY(-50%)}
+    @keyframes orbit{to{transform:rotate(360deg)}}
+    .loader-text{margin-top:-70px; text-align:center; color:#334155; font-weight:600}
+
+    /* ===== Utilities ===== */
+    .glass{backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background:var(--glass); border:1px solid var(--glass-br); border-radius:1.25rem; box-shadow:0 10px 40px rgba(16,24,40,.08)}
+    [data-reveal]{opacity:0; transform:translateY(18px); transition: all .8s cubic-bezier(.2,.8,.2,1)}
+    .reveal-in{opacity:1; transform:none}
+    .accent{background:linear-gradient(90deg, var(--brand), var(--brand2)); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .card-float{transition:transform .25s ease, box-shadow .25s ease}
+    .card-float:hover{transform:translateY(-4px); box-shadow:0 12px 30px rgba(16,24,40,.12)}
+
+    /* Heart click effect */
+    .heart{position:fixed; font-size:18px; pointer-events:none; animation: floatUp 1.4s ease forwards}
+    @keyframes floatUp{0%{transform:translate(-50%,-50%) scale(.6); opacity:1} 80%{opacity:1} 100%{transform:translate(-50%,-190%) scale(1.6); opacity:0}}
+
+    /* Breath circle + heart */
+    .breath{width:140px; height:140px; border-radius:999px; background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.92), rgba(255,255,255,.55)); border:1px solid var(--glass-br); box-shadow:0 10px 40px rgba(16,24,40,.1)}
+    .breathing{animation: inhale 4s ease-in-out infinite}
+    @keyframes inhale{0%,100%{transform:scale(1)} 50%{transform:scale(1.16)}}
+    .heart-svg{fill:#ff6b81; filter: drop-shadow(0 6px 12px rgba(255,107,129,.35));}
+    .breathing .heart-svg{animation: beat 1.2s ease-in-out infinite}
+    @keyframes beat{0%,100%{transform:scale(1)} 25%{transform:scale(1.12)} 50%{transform:scale(.98)} 75%{transform:scale(1.08)}}
+
+    /* Collage (polaroid-ish) */
+    .collage{display:grid; grid-template-columns:repeat(12,1fr); gap:14px}
+    .tile{position:relative; border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(16,24,40,.10); background:#fff}
+    .tile img{width:100%; height:100%; object-fit:cover; display:block}
+    .tile[data-r="1x1"]{grid-column: span 6; aspect-ratio:1/1}
+    .tile[data-r="2x1"]{grid-column: span 12; aspect-ratio:2/1}
+    .tile[data-r="3x2"]{grid-column: span 8; aspect-ratio:3/2}
+    .tile[data-r="2x3"]{grid-column: span 4; aspect-ratio:2/3}
+    @media (min-width:768px){
+      .tile[data-r="1x1"]{grid-column: span 3}
+      .tile[data-r="2x1"]{grid-column: span 6}
+      .tile[data-r="3x2"]{grid-column: span 6}
+      .tile[data-r="2x3"]{grid-column: span 3}
+    }
+    .tile .love{position:absolute; right:10px; bottom:10px; background:rgba(255,255,255,.8); backdrop-filter:blur(6px); border-radius:999px; padding:.25rem .5rem; font-weight:700}
+    .tile:hover .love{transform:scale(1.06)}
+  </style>
+</head>
+<body class="loading">
+  <!-- Loader -->
+  <div id="loader" class="loader-overlay">
+      <div class="loader-wrap">
+          <div class="loader-ring"></div>
+          <div class="loader-photo">
+              <!-- Ganti src ini dgn fotomu berdua -->
+              <img src="assets/loader.jpeg" alt="Foto kita" />
+            </div>
+            <div class="orbit"><span>💖</span><span>💗</span><span>❤</span><span>💞</span></div>
+            <div class="loader-text">Sebentar ya… lagi nyiapin hati & kejutan kecil 💝</div>
+    </div>
+  </div>
+
+  <!-- Sky background -->
+  <canvas id="sky" class="sky" aria-hidden="true"></canvas>
+
+  <div class="app-wrap">
+    <nav class="navbar navbar-expand-lg bg-transparent py-3">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#">HAI, SITI NABILA SARI <i class="bi bi-heart-fill text-danger ms-1"></i></a>
+        <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button> -->
+        <!-- <div class="collapse navbar-collapse" id="nav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+            <li class="nav-item"><a class="nav-link" href="#untukmu">Untukmu</a></li>
+            <li class="nav-item"><a class="nav-link" href="#rasa">Rasa</a></li>
+            <li class="nav-item"><a class="nav-link" href="#dicintai">Dicintai</a></li>
+            <li class="nav-item"><a class="nav-link" href="#memori">Memori</a></li>
+            <li class="nav-item"><a class="nav-link" href="#hiburan">Mood</a></li>
+          </ul>
+        </div> -->
+      </div>
+    </nav>
+
+    <!-- HERO / UNTUKMU -->
+    <header id="untukmu" class="py-5 py-lg-6">
+      <div class="container">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7" data-reveal>
+            <h1 class="display-5 mb-3">
+              <span class="accent">Untuk kamu yang aku sayang.</span><br>
+              Maaf, terima kasih, dan mari kita mulai lagi — lebih hangat. 🤍
+            </h1>
+            <p class="lead text-secondary">Halaman ini biar kamu ngerasa <strong>dicintai, dihargai, dan diprioritaskan</strong>. Di sini aku jujur: ada harapan, ada rasa, dan ada komitmen.</p>
+            <div class="d-flex gap-3 mt-3">
+              <a href="#rasa" class="btn btn-primary btn-lg"><i class="bi bi-journal-heart"></i> Baca Isi Hati</a>
+              <a href="#dicintai" class="btn btn-outline-primary btn-lg"><i class="bi bi-balloon-heart"></i> Rasakan Kamu Dicintai</a>
+            </div>
+          </div>
+          <div class="col-lg-5" data-reveal>
+            <div class="glass p-4 p-md-5">
+              <h5 class="fw-bold mb-3">Kecepatan Bintang Jatuh</h5>
+              <p class="text-secondary mb-1">Atur seberapa cepat bintangnya meluncur.</p>
+              <input id="speedRange" type="range" min="12" max="40" value="24" class="w-100" aria-label="Kecepatan bintang">
+              <div class="small text-muted mt-2">Tip: klik di mana saja untuk munculin ❤️ kecil.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+   <!-- RASA: Harapan, Apa yang aku rasakan, Komitmen -->
+<section id="rasa" class="py-5">
+  <div class="container">
+    <div class="text-center mb-4" data-reveal>
+      <h2 class="fw-bolder">Yang Aku Rasakan untuk Kamu</h2>
+      <p class="text-secondary">Aku tulis ini biar kamu lebih ngerti isi hatiku, tanpa drama.</p>
+    </div>
+    <div class="row g-4">
+     <div class="col-md-4" data-reveal>
+  <div class="glass p-4 h-100 card-float">
+    <div class="d-flex align-items-center mb-2">
+      <i class="bi bi-stars fs-3 me-2 text-primary"></i>
+      <h5 class="mb-0">Harapan</h5>
+    </div>
+    <p class="mb-0 text-secondary">
+      Aku pengen kita saling jaga rasa tanggung jawab dalam hubungan ini.
+      Hal-hal kecil seperti kabar atau janji jangan sampai disepelekan,
+      karena buatku itu bentuk sederhana dari saling menghargai.
+    </p>
+  </div>
+</div>
+
+      <div class="col-md-4" data-reveal>
+        <div class="glass p-4 h-100 card-float">
+          <div class="d-flex align-items-center mb-2">
+            <i class="bi bi-emoji-frown fs-3 me-2 text-warning"></i>
+            <h5 class="mb-0">Apa yang aku rasakan</h5>
+          </div>
+          <p class="mb-0 text-secondary">Kadang aku sedih dan kecewa kalau rencana berubah mendadak. Aku nggak maksud lebay, cuma pengen rasanya lebih dihargai dan dimengerti.</p>
+        </div>
+      </div>
+      <div class="col-md-4" data-reveal>
+        <div class="glass p-4 h-100 card-float">
+          <div class="d-flex align-items-center mb-2">
+            <i class="bi bi-hand-thumbs-up fs-3 me-2 text-success"></i>
+            <h5 class="mb-0">Komitmen</h5>
+          </div>
+<p class="mb-0 text-secondary">
+  Kita sama-sama usahain untuk terbuka dan saling ngomong baik-baik.
+  Kalau ada yang bikin nggak enak, kita bahas dengan tenang,
+  biar nggak ada salah paham. Yang penting, kita tetap jaga komunikasi
+  supaya hubungan ini adem dan enak dijalani bareng.
+</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- DICINTAI: Kamu dihargai & mood-boost -->
+    <section id="dicintai" class="py-5">
+      <div class="container">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-5 p-4" data-reveal>
+            <h2 class="fw-bolder mb-3">Kamu Layak Dihargai & Disayang</h2>
+            <p class="text-secondary">Aku pengen kamu ngerasa aman, diprioritaskan, dan dibahagiakan — tanpa bikin kamu capek.</p>
+          <ul class="list-unstyled mb-4">
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i> Kita sama-sama belajar menepati ucapan dan janji, biar rasa tanggung jawab selalu ada.
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i> Kita jaga perasaan satu sama lain, hal kecil pun penting buat dihargai.
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i> Kalau ada yang bikin nggak enak, kita ngobrol baik-baik supaya jelas dan nggak ada salah paham.
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i> Kita saling dukung, entah lagi seneng atau lagi berat, biar selalu terasa ada temennya.
+                </li>
+            </ul>
+
+            <button id="stampBtn" class="btn btn-success btn-lg"><i class="bi bi-hand-thumbs-up-fill me-1"></i> Approve ya sayang</button>
+          </div>
+          <div class="col-lg-7" data-reveal>
+            <div class="glass p-4 p-md-5 h-100">
+              <h5 class="fw-bold">Apa yang aku rasakan</h5>
+              <div id="reasons" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  <div class="carousel-item active"><div class="p-3 text-center">
+                    <div class="display-6">🫶</div><p class="lead mb-0">Kamu bikin aku pengen jadi lebih baik, tiap hari.</p>
+                  </div></div>
+                  <div class="carousel-item"><div class="p-3 text-center">
+                    <div class="display-6">🌤️</div><p class="lead mb-0">Senyummu itu obat capek paling mujarab.</p>
+                  </div></div>
+                  <div class="carousel-item"><div class="p-3 text-center">
+                    <div class="display-6">⭐</div><p class="lead mb-0">Di antara rencana-rencana aku, kamu tetap prioritasku.</p>
+                  </div></div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#reasons" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+                <button class="carousel-control-next" type="button" data-bs-target="#reasons" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+              </div>
+              <hr class="my-4">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button class="btn btn-outline-primary complimentBtn"><i class="bi bi-shuffle"></i> Acak Pujian</button>
+                <span id="complimentText" class="fw-semibold">Kamu unik dengan caramu sendiri — dan itu yang aku suka.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- HIBURAN / MOOD UPLIFT -->
+    <section id="hiburan" class="py-5">
+      <div class="container">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-6" data-reveal>
+            <div class="glass p-4 p-md-5  d-flex align-items-center justify-content-center flex-column" style="min-height: 350px;">
+              <h3 class="fw-bold">Mood Uplift Console</h3>
+              <p class="text-secondary">Tombol cepat buat benerin mood.</p>
+              <div class="d-flex flex-wrap gap-2 mb-3 justify-content-center">
+                <button class="btn btn-outline-danger" id="hugBtn"><i class="bi bi-heart"></i> Peluk Virtual</button>
+                <button class="btn btn-outline-success" id="jokeBtn"><i class="bi bi-emoji-laughing"></i> Joke Receh</button>
+                <button class="btn btn-outline-primary" id="breathBtn"><i class="bi bi-wind"></i> Nafas 4‑4‑4</button>
+              </div>
+              <div id="moodArea"></div>
+            </div>
+          </div>
+          <div class="col-lg-6" data-reveal>
+            <div class="glass p-4 p-md-5 text-center d-flex align-items-center justify-content-center flex-column" style="min-height: 350px;">
+              <div id="breathCircle" class="breath mx-auto mb-3 d-flex align-items-center justify-content-center">
+                <svg class="heart-svg" width="72" height="72" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 21s-6.7-4.5-9-7.2C1 12 1 9.3 3 7.8c1.6-1.2 3.9-1.1 5.4.4L12 11l3.6-2.8c1.5-1.5 3.8-1.6 5.4-.4 2 1.5 2 4.2 0 6-2.3 2.7-9 7.2-9 7.2z"></path>
+                </svg>
+              </div>
+              <div class="small text-muted">Ikuti ritme: tarik 4 dtk — tahan 4 — hembus 4 (ulang 4x). Hatinya ikut berdetak 💗</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="py-4">
+      <div class="container small text-center text-muted">
+        Dibuat dengan <i class="bi bi-heart-fill text-danger"></i> — from your cuties boyfiee
+        <div class="mt-2 d-flex justify-content-center gap-3">
+          <a href="#untukmu" class="link-underline link-underline-opacity-0"><i class="bi bi-arrow-up"></i> Kembali ke atas</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ===== Loader logic =====
+    window.addEventListener('load', ()=>{
+      setTimeout(()=>{
+        document.getElementById('loader').classList.add('hide');
+        document.body.classList.remove('loading');
+      }, 5000);
+    });
+
+    // Reveal on scroll
+    const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('reveal-in'); io.unobserve(e.target); } }), {threshold:.15});
+    document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+    // Click hearts
+    function heartBurst(x,y){
+      for(let i=0;i<8;i++){
+        const h = document.createElement('div'); h.className='heart';
+        h.style.left = (x + (Math.random()*60-30)) + 'px'; h.style.top  = (y + (Math.random()*20-10)) + 'px';
+        h.textContent = ['❤','💖','🫶','💗'][i%4]; document.body.appendChild(h);
+        setTimeout(()=>h.remove(), 1500);
+      }
+    }
+    document.addEventListener('click', e=> heartBurst(e.clientX, e.clientY));
+
+    // Stamp + confetti
+    function confetti(){
+      for(let i=0;i<80;i++){
+        const c = document.createElement('div'); c.style.position='fixed'; c.style.top='-10px'; c.style.left=(Math.random()*window.innerWidth)+'px';
+        c.textContent = Math.random()>.5 ? '✨' : '💖'; document.body.appendChild(c);
+        const start = performance.now(); const dur = 1800 + Math.random()*1200; const rot = (Math.random()*60-30);
+        (function step(t){ const p = Math.min(1, (t-start)/dur); const y = -10 + p*(window.innerHeight+30); const drift = Math.sin(p*6+i)*20; c.style.transform=`translate(${drift}px, ${y}px) rotate(${rot + p*180}deg)`; c.style.opacity=1-p; if(p<1) requestAnimationFrame(step); else c.remove(); })(start);
+      }
+    }
+    const stampBtn = document.getElementById('stampBtn'); if(stampBtn){ stampBtn.addEventListener('click', (e)=>{ const r=e.target.getBoundingClientRect(); heartBurst(r.x+r.width/2,r.y); confetti(); }); }
+
+    // Compliment shuffle
+    const cb = document.querySelector('.complimentBtn'); if(cb){
+      const compliments = [
+        'Kamu favoritku — setiap hari.',
+        'Senyummu bikin dunia terasa lebih ringan.',
+        'Cara kamu peduli itu istimewa.',
+        'Aku nyaman jadi diriku sendiri di dekatmu.',
+        'Terima kasih sudah jadi rumah untuk hatiku.',
+      ];
+      cb.addEventListener('click', ()=>{
+        const t = document.getElementById('complimentText'); t.classList.add('opacity-50');
+        setTimeout(()=>{ t.textContent = compliments[Math.floor(Math.random()*compliments.length)]; t.classList.remove('opacity-50'); heartBurst(window.innerWidth/2, 140); }, 180);
+      });
+    }
+
+    // Mood console
+    const moodArea = document.getElementById('moodArea');
+    const hugBtn = document.getElementById('hugBtn'); if(hugBtn){ hugBtn.addEventListener('click', ()=>{ moodArea.innerHTML = `<div class="alert alert-danger d-flex align-items-center" role="alert"><i class="bi bi-heart-fill me-2"></i><div>Peluk besar untukmu. Aku ada di sini. 🫶</div></div>`; confetti(); }); }
+    const jokeBtn = document.getElementById('jokeBtn'); if(jokeBtn){ jokeBtn.addEventListener('click', ()=>{ const jokes = [ 'Kalau kamu es krim, aku janji nggak akan marah kalau kamu meleleh di pelukanku. 🍦', 'Aku bukan Wi‑Fi, tapi dekat kamu sinyal hidupku full bar. 📶', 'Kamu itu kayak tombol save — bikin semuanya aman. 💾', ]; moodArea.innerHTML = `<div class="alert alert-success" role="alert">${jokes[Math.floor(Math.random()*jokes.length)]}</div>`; heartBurst(window.innerWidth/2, 160); }); }
+    const breathBtn = document.getElementById('breathBtn'); const breathCircle = document.getElementById('breathCircle'); let breathing=false, breathTimer; if(breathBtn){ breathBtn.addEventListener('click', ()=>{ breathing=!breathing; breathCircle.classList.toggle('breathing', breathing); breathBtn.innerHTML = breathing ? '<i class="bi bi-pause-circle"></i> Stop Nafas' : '<i class="bi bi-wind"></i> Nafas 4‑4‑4'; clearInterval(breathTimer); if(breathing){ let step=0; const steps=['Tarik 4 dtk','Tahan 4 dtk','Hembus 4 dtk']; moodArea.innerHTML = `<div class="alert alert-primary" role="alert">${steps[0]}</div>`; breathTimer=setInterval(()=>{ step=(step+1)%3; moodArea.innerHTML=`<div class="alert alert-primary" role="alert">${steps[step]}</div>`; },4000);} else { moodArea.innerHTML=''; } }); }
+
+    // ===== Falling stars canvas =====
+    const speedRange = document.getElementById('speedRange'); let STAR_SPEED = 1.0; if(speedRange){ speedRange.addEventListener('input', e=>{ STAR_SPEED = Number(e.target.value||24) / 24; }); }
+    const sky = document.getElementById('sky'); const ctx = sky.getContext('2d'); let W=0,H=0; function resize(){W=sky.width=window.innerWidth; H=sky.height=window.innerHeight;} resize(); window.addEventListener('resize', resize);
+    const STARS = []; const BASE_COUNT = 520; function r(a,b){return Math.random()*(b-a)+a}
+    function spawn(){ return {x:r(0,W), y:r(0,H), s:r(.4,2.1), v:r(.3,1.1), a:r(.35,.9)}; }
+    for(let i=0;i<BASE_COUNT;i++) STARS.push(spawn());
+    function loop(){ ctx.clearRect(0,0,W,H); ctx.lineCap='round'; for(const st of STARS){ const len = 5*st.s; ctx.globalAlpha = st.a; ctx.beginPath(); ctx.moveTo(st.x, st.y); ctx.lineTo(st.x - len*.45, st.y - len*.85); ctx.lineWidth = st.s; ctx.strokeStyle = 'rgba(255,255,255,'+st.a+')'; ctx.stroke(); ctx.globalAlpha = 1; st.y += st.v*1.6*STAR_SPEED; st.x += st.v*.7*STAR_SPEED; if(st.y>H+20 || st.x>W+20){ st.x = r(-20,W); st.y = r(-60,-10); st.s=r(.4,2.1); st.v=r(.3,1.1); st.a=r(.35,.9); } } requestAnimationFrame(loop); }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
